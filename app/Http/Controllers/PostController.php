@@ -7,9 +7,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class PostController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index(): View
     {
         $posts = Post::with(['user', 'tagged'])
@@ -87,7 +90,7 @@ class PostController extends Controller
     {
         $this->authorize('delete', $post);
         $post->delete();
-        
+
         return redirect()->route('posts.index')
             ->with('success', '投稿が削除されました');
     }
