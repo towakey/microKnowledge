@@ -20,7 +20,7 @@
                 </div>
             @endif
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="overflow-hidden sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     @forelse ($posts as $post)
                     <div class="mb-8 p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
