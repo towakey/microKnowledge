@@ -5,9 +5,9 @@
                 {{ isset($tag) ? "タグ: $tag の投稿一覧" : __('投稿一覧') }}
             </h2>
             @auth
-            <a href="{{ route('posts.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            <button onclick="openPostModal()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                 新規投稿
-            </a>
+            </button>
             @endauth
         </div>
     </x-slot>
@@ -69,4 +69,98 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal -->
+    <div id="postModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">新規投稿</h3>
+                <form id="quickPostForm">
+                    @csrf
+                    <div class="mb-4">
+                        <input type="text" name="title" id="title" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="{{ __('タイトル') }}" required>
+                    </div>
+                    <div class="mb-4">
+                        <textarea name="content" id="content" rows="3" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="{{ __('投稿内容を入力してください') }}" required></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <input type="text" name="tags" id="tags" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="{{ __('タグをカンマ区切りで入力（例：php, laravel）') }}">
+                    </div>
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" onclick="closePostModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                            キャンセル
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                            投稿する
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openPostModal() {
+            document.getElementById('postModal').classList.remove('hidden');
+        }
+
+        function closePostModal() {
+            document.getElementById('postModal').classList.add('hidden');
+            document.getElementById('quickPostForm').reset();
+        }
+
+        document.getElementById('quickPostForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                title: document.getElementById('title').value,
+                content: document.getElementById('content').value,
+                tags: document.getElementById('tags').value,
+                _token: document.querySelector('input[name="_token"]').value
+            };
+            
+            fetch('{{ route('posts.store') }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    closePostModal();
+                    // 成功メッセージを表示
+                    const successAlert = document.createElement('div');
+                    successAlert.className = 'bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4';
+                    successAlert.role = 'alert';
+                    successAlert.innerHTML = `<span class="block sm:inline">${data.message}</span>`;
+                    
+                    // 既存のアラートがあれば削除
+                    const existingAlert = document.querySelector('[role="alert"]');
+                    if (existingAlert) {
+                        existingAlert.remove();
+                    }
+                    
+                    // 新しいアラートを追加
+                    const container = document.querySelector('.max-w-7xl');
+                    container.insertBefore(successAlert, container.firstChild);
+                    
+                    // ページをリロード
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('投稿中にエラーが発生しました。');
+            });
+        });
+    </script>
 </x-app-layout>

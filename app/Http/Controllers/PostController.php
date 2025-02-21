@@ -32,7 +32,7 @@ class PostController extends Controller
         return view('posts.create');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'title' => 'required|max:255',
@@ -40,18 +40,40 @@ class PostController extends Controller
             'tags' => 'nullable|string'
         ]);
 
-        $post = Auth::user()->posts()->create([
-            'title' => $validated['title'],
-            'content' => $validated['content'],
-        ]);
+        try {
+            $post = Auth::user()->posts()->create([
+                'title' => $validated['title'],
+                'content' => $validated['content'],
+            ]);
 
-        if (!empty($validated['tags'])) {
-            $tags = array_map('trim', explode(',', $validated['tags']));
-            $post->tag($tags);
+            if (!empty($validated['tags'])) {
+                $tags = array_map('trim', explode(',', $validated['tags']));
+                $post->tag($tags);
+            }
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => '投稿が作成されました',
+                    'post' => $post->load(['user', 'tagged'])
+                ]);
+            }
+
+            return redirect()->route('posts.index')
+                ->with('success', '投稿が作成されました');
+        } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => '投稿の作成に失敗しました',
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', '投稿の作成に失敗しました');
         }
-
-        return redirect()->route('posts.index')
-            ->with('success', '投稿が作成されました');
     }
 
     public function show(Post $post): View
