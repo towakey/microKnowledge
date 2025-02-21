@@ -13,13 +13,18 @@ class PostController extends Controller
 {
     use AuthorizesRequests;
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $posts = Post::with(['user', 'tagged'])
-            ->latest()
-            ->paginate(10);
+        $query = Post::with(['user', 'tagged']);
 
-        return view('posts.index', compact('posts'));
+        if ($tag = $request->query('tag')) {
+            $query->withAnyTag([$tag]);
+        }
+
+        $posts = $query->latest()->paginate(10);
+        $posts->appends($request->query());
+
+        return view('posts.index', compact('posts', 'tag'));
     }
 
     public function create(): View
