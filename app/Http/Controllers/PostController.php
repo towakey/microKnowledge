@@ -33,7 +33,17 @@ class PostController extends Controller
         $posts = $query->latest()->paginate(10);
         $posts->appends($request->query());
 
-        return view('posts.index', compact('posts', 'tag'));
+        // タグ一覧を取得（使用頻度順）
+        $tags = \Illuminate\Support\Facades\DB::table('tagging_tagged')
+            ->select('tag_name as name')
+            ->selectRaw('COUNT(*) as count')
+            ->where('taggable_type', Post::class)
+            ->groupBy('tag_name')
+            ->orderByRaw('COUNT(*) DESC')
+            ->limit(20)
+            ->get();
+
+        return view('posts.index', compact('posts', 'tag', 'tags'));
     }
 
     public function create(): View
