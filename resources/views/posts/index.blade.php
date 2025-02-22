@@ -21,24 +21,6 @@
             @endif
 
             <div class="flex gap-6">
-                <!-- サイドバー -->
-                <div class="w-64 flex-shrink-0">
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">タグ一覧</h3>
-                        <div class="space-y-2">
-                            @foreach($tags as $tagItem)
-                                <div class="flex items-center justify-between">
-                                    <a href="{{ route('posts.index', ['tag' => $tagItem->name]) }}" 
-                                       class="text-sm {{ $tag === $tagItem->name ? 'text-blue-600 font-semibold' : 'text-gray-600 hover:text-gray-900' }}">
-                                        #{{ $tagItem->name }}
-                                    </a>
-                                    <span class="text-xs text-gray-500">{{ $tagItem->count }}</span>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-
                 <!-- メインコンテンツ -->
                 <div class="flex-grow">
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -98,6 +80,24 @@
                         </div>
                     </div>
                 </div>
+                <!-- サイドバー -->
+                <div class="w-64 flex-shrink-0">
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">タグ一覧</h3>
+                        <div class="space-y-2">
+                            @foreach($tags as $tagItem)
+                                <div class="flex items-center justify-between">
+                                    <a href="{{ route('posts.index', ['tag' => $tagItem->name]) }}" 
+                                       class="text-sm {{ $tag === $tagItem->name ? 'text-blue-600 font-semibold' : 'text-gray-600 hover:text-gray-900' }}">
+                                        #{{ $tagItem->name }}
+                                    </a>
+                                    <span class="text-xs text-gray-500">{{ $tagItem->count }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
