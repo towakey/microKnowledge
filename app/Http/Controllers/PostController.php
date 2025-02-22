@@ -100,7 +100,7 @@ class PostController extends Controller
     public function edit(Post $post): View
     {
         $this->authorize('update', $post);
-        $post->load('tagged');
+        $post->load(['tagged']);
         return view('posts.edit', compact('post'));
     }
 

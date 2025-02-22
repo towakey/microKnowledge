@@ -27,8 +27,20 @@
 
                         <div>
                             <x-input-label for="tags" :value="__('タグ（カンマ区切り）')" />
-                            <x-text-input id="tags" name="tags" type="text" class="mt-1 block w-full" :value="old('tags', $post->tagList)" placeholder="例: Laravel, PHP, Web開発" />
+                            <x-text-input id="tags" name="tags" type="text" class="mt-1 block w-full" :value="old('tags', implode(', ', $post->tagNames()))" placeholder="例: Laravel, PHP, Web開発" />
                             <x-input-error class="mt-2" :messages="$errors->get('tags')" />
+                        </div>
+
+                        <div>
+                            <x-input-label for="visibility" :value="__('公開設定')" />
+                            <select id="visibility" name="visibility" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                @foreach(App\Models\Post::getVisibilityOptions() as $value => $label)
+                                    <option value="{{ $value }}" {{ old('visibility', $post->visibility) === $value ? 'selected' : '' }}>
+                                        {{ $label }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <x-input-error class="mt-2" :messages="$errors->get('visibility')" />
                         </div>
 
                         <div class="flex items-center justify-end mt-4">

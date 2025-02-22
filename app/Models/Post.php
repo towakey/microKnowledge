@@ -47,6 +47,11 @@ class Post extends Model
         return $this->visibility === self::VISIBILITY_CONFIDENTIAL && (!$user || $this->user_id !== $user->id);
     }
 
+    public function getTagListAttribute()
+    {
+        return $this->tagNames();
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
