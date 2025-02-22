@@ -111,12 +111,14 @@ class PostController extends Controller
         $validated = $request->validate([
             'title' => 'required|max:255',
             'content' => 'required',
-            'tags' => 'nullable|string'
+            'tags' => 'nullable|string',
+            'visibility' => 'required|in:' . implode(',', array_keys(Post::getVisibilityOptions()))
         ]);
 
         $post->update([
             'title' => $validated['title'],
             'content' => $validated['content'],
+            'visibility' => $validated['visibility']
         ]);
 
         if (isset($validated['tags'])) {
