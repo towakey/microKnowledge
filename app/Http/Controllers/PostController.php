@@ -17,6 +17,15 @@ class PostController extends Controller
     {
         $query = Post::with(['user', 'tagged']);
 
+        if (!Auth::check()) {
+            $query->where('visibility', Post::VISIBILITY_PUBLIC);
+        } else {
+            $query->where(function($q) {
+                $q->where('visibility', Post::VISIBILITY_PUBLIC)
+                  ->orWhere('user_id', Auth::id());
+            });
+        }
+
         if ($tag = $request->query('tag')) {
             $query->withAnyTag([$tag]);
         }
@@ -37,13 +46,15 @@ class PostController extends Controller
         $validated = $request->validate([
             'title' => 'required|max:255',
             'content' => 'required',
-            'tags' => 'nullable|string'
+            'tags' => 'nullable|string',
+            'visibility' => 'required|in:' . implode(',', array_keys(Post::getVisibilityOptions()))
         ]);
 
         try {
             $post = Auth::user()->posts()->create([
                 'title' => $validated['title'],
                 'content' => $validated['content'],
+                'visibility' => $validated['visibility']
             ]);
 
             if (!empty($validated['tags'])) {
@@ -78,6 +89,10 @@ class PostController extends Controller
 
     public function show(Post $post): View
     {
+        if (!$post->isVisibleTo(Auth::user())) {
+            abort(403);
+        }
+
         $post->load(['user', 'tagged']);
         return view('posts.show', compact('post'));
     }

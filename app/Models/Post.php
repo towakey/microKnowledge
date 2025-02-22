@@ -16,8 +16,36 @@ class Post extends Model
     protected $fillable = [
         'title',
         'content',
+        'visibility',
         'user_id'
     ];
+
+    const VISIBILITY_PUBLIC = 'public';
+    const VISIBILITY_PRIVATE = 'private';
+    const VISIBILITY_CONFIDENTIAL = 'confidential';
+
+    public static function getVisibilityOptions()
+    {
+        return [
+            self::VISIBILITY_PUBLIC => '公開',
+            self::VISIBILITY_PRIVATE => '非公開',
+            self::VISIBILITY_CONFIDENTIAL => '機密'
+        ];
+    }
+
+    public function isVisibleTo($user)
+    {
+        if ($this->visibility === self::VISIBILITY_PUBLIC) {
+            return true;
+        }
+        
+        return $user && $this->user_id === $user->id;
+    }
+
+    public function shouldHideContent($user)
+    {
+        return $this->visibility === self::VISIBILITY_CONFIDENTIAL && (!$user || $this->user_id !== $user->id);
+    }
 
     public function user(): BelongsTo
     {

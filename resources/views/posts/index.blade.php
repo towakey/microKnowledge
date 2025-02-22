@@ -25,13 +25,22 @@
                     @forelse ($posts as $post)
                     <div class="mb-8 p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
                         <div class="flex justify-between items-start">
-                            <div>
-                                <h3 class="text-2xl font-bold mb-2">
-                                    <a href="{{ route('posts.show', $post) }}" class="text-blue-600 hover:text-blue-800">
-                                        {{ $post->title }}
-                                    </a>
-                                </h3>
-                                <p class="text-gray-600 mb-4">{{ Str::limit($post->content, 200) }}</p>
+                            <div class="flex-grow">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-2xl font-bold mb-2">
+                                        <a href="{{ route('posts.show', $post) }}" class="text-blue-600 hover:text-blue-800">
+                                            {{ $post->title }}
+                                        </a>
+                                    </h3>
+                                    @if($post->visibility !== 'public')
+                                        <span class="px-2 py-1 text-xs rounded {{ $post->visibility === 'private' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800' }}">
+                                            {{ App\Models\Post::getVisibilityOptions()[$post->visibility] }}
+                                        </span>
+                                    @endif
+                                </div>
+                                @if(!$post->shouldHideContent(Auth::user()))
+                                    <p class="text-gray-600 mb-4">{{ Str::limit($post->content, 200) }}</p>
+                                @endif
                             </div>
                         </div>
                         <div class="flex items-center justify-between mt-4">
@@ -86,6 +95,13 @@
                     <div class="mb-4">
                         <input type="text" name="tags" id="tags" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="{{ __('タグをカンマ区切りで入力（例：php, laravel）') }}">
                     </div>
+                    <div class="mb-4">
+                        <select name="visibility" id="visibility" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                            @foreach(App\Models\Post::getVisibilityOptions() as $value => $label)
+                                <option value="{{ $value }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="flex justify-end space-x-2">
                         <button type="button" onclick="closePostModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
                             キャンセル
@@ -116,6 +132,7 @@
                 title: document.getElementById('title').value,
                 content: document.getElementById('content').value,
                 tags: document.getElementById('tags').value,
+                visibility: document.getElementById('visibility').value,
                 _token: document.querySelector('input[name="_token"]').value
             };
             
