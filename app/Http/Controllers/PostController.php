@@ -54,47 +54,23 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|max:255',
-            'content' => 'required',
-            'tags' => 'nullable|string',
-            'visibility' => 'required|in:' . implode(',', array_keys(Post::getVisibilityOptions()))
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'visibility' => 'required|string|in:public,private,confidential',
+            'parent_id' => 'nullable|exists:posts,id',
+            'tags' => 'nullable|string'
         ]);
 
-        try {
-            $post = Auth::user()->posts()->create([
-                'title' => $validated['title'],
-                'content' => $validated['content'],
-                'visibility' => $validated['visibility']
-            ]);
+        $post = new Post($validated);
+        $post->user_id = auth()->id();
+        $post->save();
 
-            if (!empty($validated['tags'])) {
-                $tags = array_map('trim', explode(',', $validated['tags']));
-                $post->tag($tags);
-            }
-
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => '投稿が作成されました',
-                    'post' => $post->load(['user', 'tagged'])
-                ]);
-            }
-
-            return redirect()->route('posts.index')
-                ->with('success', '投稿が作成されました');
-        } catch (\Exception $e) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => '投稿の作成に失敗しました',
-                    'error' => $e->getMessage()
-                ], 500);
-            }
-
-            return redirect()->back()
-                ->withInput()
-                ->with('error', '投稿の作成に失敗しました');
+        if (!empty($validated['tags'])) {
+            $tags = explode(',', $validated['tags']);
+            $post->tag($tags);
         }
+
+        return redirect()->route('posts.index');
     }
 
     public function show(Post $post): View

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\User;
+use App\Models\Post;
 
 class Post extends Model
 {
@@ -17,7 +18,8 @@ class Post extends Model
         'title',
         'content',
         'visibility',
-        'user_id'
+        'user_id',
+        'parent_id'
     ];
 
     const VISIBILITY_PUBLIC = 'public';
@@ -55,5 +57,15 @@ class Post extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Post::class, 'parent_id');
+    }
+
+    public function replies()
+    {
+        return $this->hasMany(Post::class, 'parent_id');
     }
 }

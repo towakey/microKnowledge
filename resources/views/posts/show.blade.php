@@ -42,7 +42,75 @@
                         <div class="prose max-w-none">
                             {!! nl2br(e($post->content)) !!}
                         </div>
+                        
+                        <!-- ACTIONボタン -->
+                        <div class="mt-4">
+                            <button onclick="openReplyModal()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                ACTION
+                            </button>
+                        </div>
                     </div>
+
+                    <!-- 返信モーダル -->
+                    <div id="replyModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full">
+                        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                            <div class="mt-3">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900">返信を作成</h3>
+                                <form method="POST" action="{{ route('posts.store') }}" class="mt-4">
+                                    @csrf
+                                    <input type="hidden" name="parent_id" value="{{ $post->id }}">
+                                    <div class="mb-4">
+                                        <label for="title" class="block text-gray-700 text-sm font-bold mb-2">タイトル</label>
+                                        <input type="text" name="title" id="title" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="content" class="block text-gray-700 text-sm font-bold mb-2">内容</label>
+                                        <textarea name="content" id="content" rows="4" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required></textarea>
+                                    </div>
+                                    <input type="hidden" name="visibility" value="public">
+                                    <div class="flex justify-end space-x-4">
+                                        <button type="button" onclick="closeReplyModal()" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                                            キャンセル
+                                        </button>
+                                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                            投稿
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 返信投稿の表示 -->
+                    @if($post->replies->isNotEmpty())
+                    <div class="mt-8 border-t pt-6">
+                        <h3 class="text-lg font-semibold mb-4">返信</h3>
+                        <div class="space-y-6">
+                            @foreach($post->replies as $reply)
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex items-center space-x-4 mb-2">
+                                    <div class="flex items-center space-x-2">
+                                        @if($reply->user->avatar)
+                                            <img src="{{ $reply->user->avatar }}" alt="{{ $reply->user->name }}" class="w-8 h-8 rounded-full">
+                                        @endif
+                                        <span class="text-gray-600 font-medium">{{ $reply->user->name }}</span>
+                                    </div>
+                                    <span class="text-gray-500">{{ $reply->created_at->format('Y/m/d H:i') }}</span>
+                                </div>
+                                <h4 class="font-semibold mb-2">{{ $reply->title }}</h4>
+                                <div class="prose max-w-none">
+                                    {!! nl2br(e($reply->content)) !!}
+                                </div>
+                                <div class="mt-2">
+                                    <a href="{{ route('posts.show', $reply) }}" class="text-blue-500 hover:text-blue-700">
+                                        詳細を見る
+                                    </a>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
 
                     @if($post->tags->isNotEmpty())
                     <div class="mt-6 border-t pt-6">

@@ -13,6 +13,17 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        
+        <!-- モーダル制御用のJavaScript -->
+        <script>
+            function openReplyModal() {
+                document.getElementById('replyModal').classList.remove('hidden');
+            }
+
+            function closeReplyModal() {
+                document.getElementById('replyModal').classList.add('hidden');
+            }
+        </script>
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
