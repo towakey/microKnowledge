@@ -23,8 +23,8 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+            <div class="overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 {{ Auth::id() === $post->user_id ? 'bg-white' : 'bg-indigo-50' }}">
                     <div class="mb-6">
                         <div class="flex items-center space-x-4 mb-4">
                             <div class="flex items-center space-x-2">
@@ -87,7 +87,7 @@
                         <h3 class="text-lg font-semibold mb-4">返信</h3>
                         <div class="space-y-6">
                             @foreach($post->replies as $reply)
-                            <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="p-4 rounded-lg {{ Auth::id() === $reply->user_id ? 'bg-white' : 'bg-indigo-50' }}">
                                 <div class="flex justify-between items-start">
                                     <div class="flex items-center space-x-4 mb-2">
                                         <div class="flex items-center space-x-2">

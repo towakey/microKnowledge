@@ -23,50 +23,52 @@
             <div class="flex gap-6">
                 <!-- メインコンテンツ -->
                 <div class="flex-grow">
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-6 text-gray-900">
+                    <div class="bg-transparent">
+                        <div class="p-6 space-y-4">
                             @forelse ($posts as $post)
-                            <div class="mb-8 p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
-                                <div class="flex justify-between items-start">
-                                    <div class="flex-grow">
-                                        <div class="flex items-center gap-2">
-                                            <h3 class="text-2xl font-bold mb-2">
-                                                <a href="{{ route('posts.show', $post) }}" class="text-blue-600 hover:text-blue-800">
-                                                    {{ $post->title }}
-                                                </a>
-                                            </h3>
-                                            @if($post->visibility !== 'public')
-                                                <span class="px-2 py-1 text-xs rounded {{ $post->visibility === 'private' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800' }}">
-                                                    {{ App\Models\Post::getVisibilityOptions()[$post->visibility] }}
-                                                </span>
+                            <div class="rounded-lg {{ Auth::id() === $post->user_id ? 'bg-white' : 'bg-indigo-50 border-indigo-100' }} border-2 shadow hover:shadow-md transition-all duration-300">
+                                <div class="p-6">
+                                    <div class="flex justify-between items-start">
+                                        <div class="flex-grow">
+                                            <div class="flex items-center gap-2">
+                                                <h3 class="text-2xl font-bold mb-2">
+                                                    <a href="{{ route('posts.show', $post) }}" class="text-blue-600 hover:text-blue-800">
+                                                        {{ $post->title }}
+                                                    </a>
+                                                </h3>
+                                                @if($post->visibility !== 'public')
+                                                    <span class="px-2 py-1 text-xs rounded {{ $post->visibility === 'private' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800' }}">
+                                                        {{ App\Models\Post::getVisibilityOptions()[$post->visibility] }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            @if($post->visibility !== App\Models\Post::VISIBILITY_CONFIDENTIAL)
+                                                <p class="text-gray-600 mb-4">{{ Str::limit($post->content, 200) }}</p>
                                             @endif
                                         </div>
-                                        @if($post->visibility !== App\Models\Post::VISIBILITY_CONFIDENTIAL)
-                                            <p class="text-gray-600 mb-4">{{ Str::limit($post->content, 200) }}</p>
-                                        @endif
                                     </div>
-                                </div>
-                                <div class="flex items-center justify-between mt-4">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="flex items-center space-x-2">
-                                            @if($post->user->avatar)
-                                                <img src="{{ $post->user->avatar }}" alt="{{ $post->user->name }}" class="w-6 h-6 rounded-full">
-                                            @endif
-                                            <span class="text-sm text-gray-600">
-                                                {{ $post->user->name }}
+                                    <div class="flex items-center justify-between mt-4">
+                                        <div class="flex items-center space-x-4">
+                                            <div class="flex items-center space-x-2">
+                                                @if($post->user->avatar)
+                                                    <img src="{{ $post->user->avatar }}" alt="{{ $post->user->name }}" class="w-6 h-6 rounded-full">
+                                                @endif
+                                                <span class="text-sm {{ Auth::id() === $post->user_id ? 'text-gray-600' : 'text-indigo-600 font-medium' }}">
+                                                    {{ $post->user->name }}
+                                                </span>
+                                            </div>
+                                            <span class="text-sm text-gray-500">
+                                                {{ $post->created_at->format('Y/m/d H:i') }}
                                             </span>
                                         </div>
-                                        <span class="text-sm text-gray-500">
-                                            {{ $post->created_at->format('Y/m/d H:i') }}
-                                        </span>
-                                    </div>
-                                    <div class="flex flex-wrap gap-2">
-                                        @foreach($post->tagged as $tag)
-                                        <a href="{{ route('posts.index', ['tag' => $tag->tag_name]) }}" 
-                                           class="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-sm">
-                                            #{{ $tag->tag_name }}
-                                        </a>
-                                        @endforeach
+                                        <div class="flex flex-wrap gap-2">
+                                            @foreach($post->tagged as $tag)
+                                            <a href="{{ route('posts.index', ['tag' => $tag->tag_name]) }}" 
+                                               class="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-sm">
+                                                #{{ $tag->tag_name }}
+                                            </a>
+                                            @endforeach
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -104,7 +106,7 @@
 
     <!-- Modal -->
     <div id="postModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-blue-50">
             <div class="mt-3">
                 <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">新規投稿</h3>
                 <form id="quickPostForm">
