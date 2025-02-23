@@ -33,12 +33,28 @@ class PostController extends Controller
         $posts = $query->latest()->paginate(10);
         $posts->appends($request->query());
 
-        // タグ一覧を取得（使用頻度順）
-        $tags = \Illuminate\Support\Facades\DB::table('tagging_tagged')
+        // タグ一覧を取得（アクセス可能な投稿のタグのみ）
+        $tagsQuery = \Illuminate\Support\Facades\DB::table('tagging_tagged')
             ->select('tag_name as name')
             ->selectRaw('COUNT(*) as count')
             ->where('taggable_type', Post::class)
-            ->groupBy('tag_name')
+            ->join('posts', function($join) {
+                $join->on('tagging_tagged.taggable_id', '=', 'posts.id')
+                     ->where('tagging_tagged.taggable_type', '=', Post::class);
+            });
+
+        if (!Auth::check()) {
+            // 未ログインユーザーは公開投稿のタグのみ
+            $tagsQuery->where('posts.visibility', Post::VISIBILITY_PUBLIC);
+        } else {
+            // ログインユーザーは公開投稿と自分の投稿のタグ
+            $tagsQuery->where(function($q) {
+                $q->where('posts.visibility', Post::VISIBILITY_PUBLIC)
+                  ->orWhere('posts.user_id', Auth::id());
+            });
+        }
+
+        $tags = $tagsQuery->groupBy('tag_name')
             ->orderByRaw('COUNT(*) DESC')
             ->limit(20)
             ->get();
