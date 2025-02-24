@@ -74,7 +74,8 @@ class PostController extends Controller
             'content' => 'required|string',
             'visibility' => 'required|string|in:public,private,confidential',
             'parent_id' => 'nullable|exists:posts,id',
-            'tags' => 'nullable|string'
+            'tags' => 'nullable|string',
+            'display_type' => 'required|integer|in:0,1'
         ]);
 
         $post = new Post($validated);
@@ -84,6 +85,14 @@ class PostController extends Controller
         if (!empty($validated['tags'])) {
             $tags = explode(',', $validated['tags']);
             $post->tag($tags);
+        }
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => '投稿が作成されました',
+                'redirect' => route('posts.index')
+            ]);
         }
 
         return redirect()->route('posts.index');
@@ -114,13 +123,15 @@ class PostController extends Controller
             'title' => 'required|max:255',
             'content' => 'required',
             'tags' => 'nullable|string',
-            'visibility' => 'required|in:' . implode(',', array_keys(Post::getVisibilityOptions()))
+            'visibility' => 'required|in:' . implode(',', array_keys(Post::getVisibilityOptions())),
+            'display_type' => 'required|integer|in:0,1'
         ]);
 
         $post->update([
             'title' => $validated['title'],
             'content' => $validated['content'],
-            'visibility' => $validated['visibility']
+            'visibility' => $validated['visibility'],
+            'display_type' => $validated['display_type']
         ]);
 
         if (isset($validated['tags'])) {

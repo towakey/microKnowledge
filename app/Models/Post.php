@@ -19,12 +19,17 @@ class Post extends Model
         'content',
         'visibility',
         'user_id',
-        'parent_id'
+        'parent_id',
+        'display_type'
     ];
 
     const VISIBILITY_PUBLIC = 'public';
     const VISIBILITY_PRIVATE = 'private';
     const VISIBILITY_CONFIDENTIAL = 'confidential';
+
+    // 表示形式の定数
+    const DISPLAY_TYPE_TEXT = 0;
+    const DISPLAY_TYPE_MARKDOWN = 1;
 
     public static function getVisibilityOptions()
     {
@@ -32,6 +37,15 @@ class Post extends Model
             self::VISIBILITY_PUBLIC => '公開',
             self::VISIBILITY_PRIVATE => '非公開',
             self::VISIBILITY_CONFIDENTIAL => '機密'
+        ];
+    }
+
+    // 表示形式のオプション
+    public static function getDisplayTypeOptions(): array
+    {
+        return [
+            self::DISPLAY_TYPE_TEXT => 'テキスト',
+            self::DISPLAY_TYPE_MARKDOWN => 'Markdown'
         ];
     }
 

@@ -121,8 +121,17 @@
                         <input type="text" name="tags" id="tags" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="{{ __('タグをカンマ区切りで入力（例：php, laravel）') }}">
                     </div>
                     <div class="mb-4">
-                        <select name="visibility" id="visibility" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
-                            @foreach(App\Models\Post::getVisibilityOptions() as $value => $label)
+                        <label for="modalVisibility" class="block text-sm font-medium text-gray-700 mb-1">公開設定</label>
+                        <select id="modalVisibility" name="visibility" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            <option value="public">公開</option>
+                            <option value="private">非公開</option>
+                            <option value="confidential">機密</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="modalDisplayType" class="block text-sm font-medium text-gray-700 mb-1">表示形式</label>
+                        <select id="modalDisplayType" name="display_type" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            @foreach(App\Models\Post::getDisplayTypeOptions() as $value => $label)
                                 <option value="{{ $value }}">{{ $label }}</option>
                             @endforeach
                         </select>
@@ -150,59 +159,58 @@
             document.getElementById('quickPostForm').reset();
         }
 
-        document.getElementById('quickPostForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        function submitQuickPost(event) {
+            event.preventDefault();
             
             const formData = {
                 title: document.getElementById('title').value,
                 content: document.getElementById('content').value,
                 tags: document.getElementById('tags').value,
-                visibility: document.getElementById('visibility').value,
+                visibility: document.getElementById('modalVisibility').value,
+                display_type: document.getElementById('modalDisplayType').value,
                 _token: document.querySelector('input[name="_token"]').value
             };
-            
+
             fetch('{{ route('posts.store') }}', {
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify(formData)
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    return response.json().then(err => Promise.reject(err));
                 }
                 return response.json();
             })
             .then(data => {
                 if (data.success) {
-                    closePostModal();
-                    // 成功メッセージを表示
-                    const successAlert = document.createElement('div');
-                    successAlert.className = 'bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4';
-                    successAlert.role = 'alert';
-                    successAlert.innerHTML = `<span class="block sm:inline">${data.message}</span>`;
-                    
-                    // 既存のアラートがあれば削除
-                    const existingAlert = document.querySelector('[role="alert"]');
-                    if (existingAlert) {
-                        existingAlert.remove();
-                    }
-                    
-                    // 新しいアラートを追加
-                    const container = document.querySelector('.max-w-7xl');
-                    container.insertBefore(successAlert, container.firstChild);
-                    
-                    // ページをリロード
-                    window.location.reload();
+                    // 成功時の処理
+                    window.location.href = data.redirect;
                 }
             })
             .catch(error => {
+                // エラー処理
                 console.error('Error:', error);
-                alert('投稿中にエラーが発生しました。');
+                if (error.errors) {
+                    // バリデーションエラーの処理
+                    Object.keys(error.errors).forEach(key => {
+                        const input = document.getElementById(key);
+                        if (input) {
+                            input.classList.add('border-red-500');
+                            const errorDiv = document.createElement('div');
+                            errorDiv.className = 'text-red-500 text-sm mt-1';
+                            errorDiv.textContent = error.errors[key][0];
+                            input.parentNode.appendChild(errorDiv);
+                        }
+                    });
+                }
             });
-        });
+        }
+
+        document.getElementById('quickPostForm').addEventListener('submit', submitQuickPost);
     </script>
 </x-app-layout>

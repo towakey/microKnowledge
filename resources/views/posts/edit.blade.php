@@ -33,14 +33,22 @@
 
                         <div>
                             <x-input-label for="visibility" :value="__('公開設定')" />
-                            <select id="visibility" name="visibility" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            <select id="visibility" name="visibility" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                                 @foreach(App\Models\Post::getVisibilityOptions() as $value => $label)
-                                    <option value="{{ $value }}" {{ old('visibility', $post->visibility) === $value ? 'selected' : '' }}>
-                                        {{ $label }}
-                                    </option>
+                                    <option value="{{ $value }}" {{ old('visibility', $post->visibility) == $value ? 'selected' : '' }}>{{ $label }}</option>
                                 @endforeach
                             </select>
                             <x-input-error class="mt-2" :messages="$errors->get('visibility')" />
+                        </div>
+
+                        <div>
+                            <x-input-label for="display_type" :value="__('表示形式')" />
+                            <select id="display_type" name="display_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                                @foreach(App\Models\Post::getDisplayTypeOptions() as $value => $label)
+                                    <option value="{{ $value }}" {{ old('display_type', $post->display_type) == $value ? 'selected' : '' }}>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                            <x-input-error class="mt-2" :messages="$errors->get('display_type')" />
                         </div>
 
                         <div class="flex items-center justify-end mt-4">
