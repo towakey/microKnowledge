@@ -106,7 +106,7 @@
 
     <!-- Modal -->
     <div id="postModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-blue-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-blue-50 bg-white">
             <div class="mt-3">
                 <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">新規投稿</h3>
                 <form id="quickPostForm">
