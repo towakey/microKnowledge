@@ -40,7 +40,7 @@
                             </span>
                         </div>
                         <div class="prose max-w-none">
-                            {!! nl2br(e($post->content)) !!}
+                            {!! $post->getFormattedContent() !!}
                         </div>
                         
                         <!-- ACTIONボタン -->
@@ -119,7 +119,7 @@
                                 </div>
                                 <h4 class="font-semibold mb-2">{{ $reply->title }}</h4>
                                 <div class="prose max-w-none">
-                                    {!! nl2br(e($reply->content)) !!}
+                                    {!! $reply->getFormattedContent() !!}
                                 </div>
                                 <div class="mt-2">
                                     <a href="{{ route('posts.show', $reply) }}" class="text-blue-500 hover:text-blue-700">

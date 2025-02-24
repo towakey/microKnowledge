@@ -43,8 +43,10 @@
                                                 @endif
                                             </div>
                                             @if($post->visibility !== App\Models\Post::VISIBILITY_CONFIDENTIAL)
-                                                <p class="text-gray-600 mb-4">{{ Str::limit($post->content, 200) }}</p>
-                                            @endif
+                                                <div class="text-gray-600 mb-4 prose max-w-none">
+                                                    {!! Str::limit($post->getFormattedContent(), 200) !!}
+                                                </div>
+                                            @endif                                        
                                         </div>
                                     </div>
                                     <div class="flex items-center justify-between mt-4">

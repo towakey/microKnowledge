@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\User;
 use App\Models\Post;
+use League\CommonMark\Environment\Environment;
+use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
+use League\CommonMark\MarkdownConverter;
 
 class Post extends Model
 {
@@ -81,5 +84,18 @@ class Post extends Model
     public function replies()
     {
         return $this->hasMany(Post::class, 'parent_id');
+    }
+
+    public function getFormattedContent(): string
+    {
+        if ($this->display_type === self::DISPLAY_TYPE_MARKDOWN) {
+            $environment = new Environment();
+            $environment->addExtension(new CommonMarkCoreExtension());
+            
+            $converter = new MarkdownConverter($environment);
+            return $converter->convert($this->content)->getContent();
+        }
+
+        return nl2br(e($this->content));
     }
 }
