@@ -30,6 +30,16 @@
                             <x-input-error class="mt-2" :messages="$errors->get('tags')" />
                         </div>
 
+                        <div>
+                            <x-input-label for="visibility" :value="__('公開設定')" />
+                            <select id="visibility" name="visibility" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                                <option value="public" {{ old('visibility') == 'public' ? 'selected' : '' }}>公開</option>
+                                <option value="private" {{ old('visibility') == 'private' ? 'selected' : '' }}>非公開</option>
+                                <option value="confidential" {{ old('visibility') == 'confidential' ? 'selected' : '' }}>機密</option>
+                            </select>
+                            <x-input-error class="mt-2" :messages="$errors->get('visibility')" />
+                        </div>
+
                         <div class="flex items-center justify-end mt-4">
                             <x-secondary-button onclick="window.history.back()" type="button" class="mr-3">
                                 {{ __('キャンセル') }}
