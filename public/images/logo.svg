@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="40" viewBox="0 0 200 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- マテリアルデザインの影を定義 -->
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="1" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- 六角形のパターングループ -->
+  <g transform="translate(10, 20)" filter="url(#shadow)">
+    <!-- メインの六角形 -->
+    <path d="M17.3205 0L34.641 10V30L17.3205 40L0 30V10L17.3205 0Z" fill="#2196F3"/>
+    
+    <!-- 内側の六角形パターン -->
+    <path d="M17.3205 5L29.641 12V26L17.3205 33L5 26V12L17.3205 5Z" fill="#1976D2"/>
+    <path d="M17.3205 10L24.641 14V22L17.3205 26L10 22V14L17.3205 10Z" fill="#BBDEFB"/>
+  </g>
+
+  <!-- テキスト部分 -->
+  <g transform="translate(50, 0)">
+    <!-- micro -->
+    <text x="0" y="25" font-family="Roboto, sans-serif" font-size="16" font-weight="500" fill="#1976D2">
+      micro
+    </text>
+    <!-- Knowledge -->
+    <text x="40" y="25" font-family="Roboto, sans-serif" font-size="16" font-weight="700" fill="#2196F3">
+      Knowledge
+    </text>
+  </g>
+
+  <!-- アクセントライン -->
+  <path d="M45 20h2" stroke="#2196F3" stroke-width="2" stroke-linecap="round"/>
+</svg>
