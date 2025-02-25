@@ -68,6 +68,7 @@
                                         <textarea name="content" id="content" rows="4" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required></textarea>
                                     </div>
                                     <input type="hidden" name="visibility" value="public">
+                                    <input type="hidden" name="display_type" value="0">
                                     <div class="flex justify-end space-x-4">
                                         <button type="button" onclick="closeReplyModal()" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
                                             キャンセル
